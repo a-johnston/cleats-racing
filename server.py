@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template
-from flask_shelve import get_shelve, init_app
+from functools import lru_cache
+from data_churner import *
 
-
-settings = {
-    'SHELVE_FILENAME':'points',
-}
 
 app = Flask(__name__)
-app.config.update(settings)
-
-init_app(app)
 
 
 @app.route('/')
+@lru_cache(maxsize=None)
 def index():
-    points_dict = get_shelve('r')
-    return render_template('index.html')
+    riders, rides = parse_all_data()
+    rides_results = [compute_ride_results(riders, r[1]) for r in rides.items()]
+    overall = compute_overall_totals(rides_results)
+
+    return render_template('index.html', overall=overall)
 
 
 @app.errorhandler(404)

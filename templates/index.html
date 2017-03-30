@@ -16,56 +16,20 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading"><img src="static/Jersey_yellow.png">Overall</div>
-            <div class="panel-body">
-            </div>
-        </div>
-    </div>
-</div>
+{% with flag="static/Jersey_yellow.png", _results=overall['GC'], _title="GC" %}
+    {% include "results_box.html" %}
+{% endwith %}
 
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading"><img src="static/Jersey_polkadot.png">KOM</div>
-            <div class="panel-body">
-                <ul>
-                {% for h in hints %}
-                <li><a href="{{url_for('hints', hint=h)}}">Flag {{h}}</a></li>
-                {% endfor %}
-                </ul>
-        </div>
-    </div>
-</div>
+{% with flag="static/Jersey_polkadot.png", _results=overall['KOM'], _title="KOM" %}
+    {% include "results_box.html" %}
+{% endwith %}
 
-<div class="col-md-8 col-md-offset-2">
-    <div class="panel panel-default">
-        <div class="panel-heading"><img src="static/Jersey_polkadot.png">QOM</div>
-        <div class="panel-body">
-            <ol>
-            {% for b in board %}
-            <li><a href="{{url_for('score', username=b[0])}}">{{b[0]}}</a> &dash; {{b[2]}} points &dash; {{b[1]}} found</li>
-            {% endfor %}
-            </ol>
-        </div>
-    </div>
-</div>
-</div>
+{% with flag="static/Jersey_polkadot.png", _results=overall['QOM'], _title="QOM" %}
+    {% include "results_box.html" %}
+{% endwith %}
 
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading"><img src="static/Jersey_green.png">Sprint</div>
-            <div class="panel-body">
-            <ul>
-                {% for h in hints %}
-                <li><a href="{{url_for('hints', hint=h)}}">Flag {{h}}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-</div>
+{% with flag="static/Jersey_green.png", _results=overall['Sprint'], _title="Sprint" %}
+    {% include "results_box.html" %}
+{% endwith %}
 
 {% endblock %}

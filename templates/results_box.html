@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading"><img src="{{ flag }}">{{ title }}</div>
+            <div class="panel-body">
+            <table class="table">
+            <tr><th>Name</th><th>Points</th>
+            {% for entry in _results %}
+                <tr><td>{{ entry[0] }}</td><td class="col-md-2">{{ entry[1] }}</td></tr>
+            {% endfor %}
+            </table>
+            </div>
+        </div>
+    </div>
+</div>

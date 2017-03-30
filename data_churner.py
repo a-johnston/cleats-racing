@@ -94,3 +94,60 @@ def parse_all_data(
     rides = {ride: parse_ride_info(ride) for ride in files}
 
     return riders, rides
+
+
+def _sort_by_points(l):
+    return sorted(l, key=lambda x: x[-1], reverse=True)
+
+
+def compute_ride_results(riders, ride):
+    ''' Returns the printable results for a given ride. Intermediate events
+        (KOMs, QOMs, Sprint, GC) are returned as a tuple with type, event
+        name, and a descending list of names and points. Totals for all events
+        simply are the event type mapping to a descending list of point sums.
+    '''
+    events = []
+    totals = {
+        'KOM': {},
+        'QOM': {},
+        'Sprint': {},
+        'GC': {},
+    }
+
+    for event in ride:
+        l = [(riders[x[0]], x[1]) for x in event[2].items()]
+        l = _sort_by_points(l)
+        events.append((event[0], event[1], l))
+
+        for x in event[2].items():
+            rider = riders[x[0]]
+            if rider not in totals[event[0]]:
+                totals[event[0]][rider] = 0
+            totals[event[0]][rider] += x[1]
+
+    totals = {x[0]: _sort_by_points(x[1].items()) for x in totals.items()}
+
+    return events, totals
+
+
+def compute_overall_totals(rides_results):
+    '''
+    '''
+    totals = {
+        'KOM': {},
+        'QOM': {},
+        'Sprint': {},
+        'GC': {},
+    }
+
+    for total in rides_results:
+        total = total[1]
+        for event_type in total:
+            for rider in total[event_type]:
+                if rider[0] not in totals[event_type]:
+                    totals[event_type][rider[0]] = 0
+                totals[event_type][rider[0]] += rider[1]
+
+    totals = {x[0]: _sort_by_points(x[1].items()) for x in totals.items()}
+
+    return totals
