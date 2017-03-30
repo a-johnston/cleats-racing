@@ -1,103 +1,118 @@
 import csv
 import os
+import requests
+from collections import namedtuple
 
 
-DEFAULT_DATA_DIR = 'data'
-DEFAULT_RIDER_INFO_FILE = 'riders.csv'
+DEFAULT_DATA_FILE = 'data.csv'
+DEFAULT_GSHEET_KEY = '11uhc4wGjhvH5T-M6RTt9kyMA6oDoEJrDjxZZo_7chuA'
 
 
-def parse_rider_info(
-    data_dir=DEFAULT_DATA_DIR,
-    rider_info_file=DEFAULT_RIDER_INFO_FILE,
-):
-    ''' Returns rider info, importantly IDs and names, for use with ride CSVs.
+Ride = namedtuple('Ride', ('id', 'title', 'results'))
+Rider = namedtuple('Rider', ('id', 'name'))
+Event = namedtuple('Event', ('id', 'cat', 'title', 'results'))
 
-        Returns dictionary mapping int ID to str name
+
+EVENT_CATS = ('kom', 'qom', 'sprint', 'gc')
+
+
+def _idx_and_item(l):
+    return zip(range(len(l)), l)
+
+
+def _map_index(i):
+    return lambda x: x[i]
+
+
+def download_gsheets_csv(key=DEFAULT_GSHEET_KEY):
+    ''' Returns the CSV of the Google Sheet with the given key as a string
     '''
-    path = os.path.join(data_dir, rider_info_file)
+    url = 'https://docs.google.com/spreadsheet/ccc?key={}&output=csv'
+    r = requests.get(url.format(key))
+    r.raise_for_status()
+    return r.content.decode()
 
+
+def parse_data(data_file=DEFAULT_DATA_FILE, _gsheet_key=DEFAULT_GSHEET_KEY):
+    ''' Returns the tuple (riders, rides) where riders is a dict mapping id to
+        name and rides is a dict mapping ride id to Ride namedtuple.
+
+        The results dict of a Ride is a list of events and the
+        results dict of an event is a dict mapping rider id to points.
+
+        If data_file does not exist, this method attempts to download it from
+        Google Sheets using the URI key for a public Google Sheet. This may
+        take a few seconds (and prone to rate limiting) but the CSV is then
+        saved as the given data_file for future use.
+    '''
+    rides = {}
     riders = {}
-
-    reader = csv.reader(open(path))
-    header = next(reader)
-
-    if 'ID' not in header or 'Name' not in header:
-        raise Exception('Malformed rider info header')
-
-    idx = header.index('ID')
-    name = header.index('Name')
-
-    for entry in reader:
-        if entry[name]:
-            riders[int(entry[idx])] = entry[name]
-
-    return riders
-
-
-def parse_ride_info(
-    ride_file,
-    data_dir=DEFAULT_DATA_DIR,
-):
-    ''' Parses a CSV for a given ride and returns the intermediate sprint and
-        KOM/QOM points as well as GC if provided.
-
-        Returns a list of tuples identifying intermediate event type, name,
-        and results. The results are a dict mapping rider ID to points.
-
-        Example:
-
-        [('Sprint', 'Unicorn', {2: 2, 6, 1}), ...]
-
-        Rider 2 scored 2 points while rider 6 scored 1 point on the Unicorn
-        sprint.
-    '''
-    path = os.path.join(data_dir, ride_file)
-
-    reader = csv.reader(open(path))
-    header = next(reader)
-
-    if 'ID' not in header:
-        raise Exception('Malformed ride info header')
-
-    idx = header.index('ID')
-
     events = {}
-    last_name_hack = ''
-    for i, value in zip(range(len(header)), header):
-        split = (value + ':' + last_name_hack).split(':')
-        event_type = split[0]
-        event_name = split[1]
-        last_name_hack = event_name
 
-        if event_type in ('Sprint', 'KOM', 'QOM', 'GC'):
-            events[i] = (event_type, event_name, {})
+    if data_file and os.path.exists(data_file):
+        with open(data_file) as f:
+            data_string = f.read()
+    else:
+        data_string = download_gsheets_csv(_gsheet_key)
+        if data_file:
+            with open(data_file, 'w') as f:
+                f.write(data_string)
 
+    reader = csv.reader(data_string.split('\n'))
+
+    # contains ride title at or preceding first ride intermediate
+    ride_row = next(reader)
+    if ride_row[0] != '' or ride_row[1] != '':
+        print(ride_row)
+        raise Exception('Unexpected format for first row')
+    
+    for ride in filter(_map_index(1), _idx_and_item(ride_row)):
+        rides[ride[0]] = Ride(*ride, [])
+
+    # should contain the ID and Name column headers for riders and
+    # intermediate event types and names for each ride
+    info_row = next(reader)
+    if info_row[0].lower() != 'id' or info_row[1].lower() != 'name':
+        raise Exception('Needs ID and name in row 2, col 1, 2 respectively')
+
+    prev_name_hack = ''
+    for idx, event in _idx_and_item(info_row):
+        event = (event + ':' + prev_name_hack).split(':')
+        prev_name_hack = event[1]
+        event[0] = event[0].lower()
+
+        if event[0] in ('kom', 'qom', 'sprint', 'gc'):
+            ride_idx = max(filter(lambda i: i<= idx, rides))
+            intermediate = Event(idx, event[0], event[1], {})
+            events[intermediate.id] = intermediate
+            rides[ride_idx].results.append(intermediate)
+
+    # each subsequent row contains a unique rider ID, their name, and their
+    # results on each ride event (blank is interpretted as 0)
     for rider in reader:
-        rider_id = int(rider[idx])
+        rider_id = rider[0]
+        rider_name = rider[1]
 
-        for event_id in events:
-            if rider[event_id]:
-                events[event_id][2][rider_id] = int(rider[event_id])
+        if not rider_name:
+            continue
 
-    return list(events.values())
+        riders[rider_id] = Rider(rider[0], rider[1])
 
+        for idx, result in list(_idx_and_item(rider))[2:]:
+            if result:
+                if rider_id not in events[idx].results:
+                    events[idx].results[rider_id] = 0
+                events[idx].results[rider_id] += int(result)
 
-def parse_all_data(
-    data_dir=DEFAULT_DATA_DIR,
-    rider_info_file=DEFAULT_RIDER_INFO_FILE,
-):
-    files = os.listdir(data_dir)
-    files.remove(rider_info_file)
-
-    riders = parse_rider_info(data_dir, rider_info_file)
-
-    rides = {ride: parse_ride_info(ride) for ride in files}
-
-    return riders, rides
+    return riders, list(rides.values())
 
 
 def _sort_by_points(l):
-    return sorted(l, key=lambda x: x[-1], reverse=True)
+    return sorted(l, key=_map_index(-1), reverse=True)
+
+
+def compute_all_ride_results(riders, rides):
+    return [compute_ride_results(riders, ride) for ride in rides]
 
 
 def compute_ride_results(riders, ride):
@@ -107,23 +122,21 @@ def compute_ride_results(riders, ride):
         simply are the event type mapping to a descending list of point sums.
     '''
     events = []
-    totals = {
-        'KOM': {},
-        'QOM': {},
-        'Sprint': {},
-        'GC': {},
-    }
+    totals = {x: {} for x in EVENT_CATS}
 
-    for event in ride:
-        l = [(riders[x[0]], x[1]) for x in event[2].items()]
-        l = _sort_by_points(l)
-        events.append((event[0], event[1], l))
+    for event in ride.results:
+        l = []
 
-        for x in event[2].items():
+        for x in event.results.items():
             rider = riders[x[0]]
-            if rider not in totals[event[0]]:
-                totals[event[0]][rider] = 0
-            totals[event[0]][rider] += x[1]
+            if rider.name not in totals[event.cat]:
+                totals[event.cat][rider.name] = 0
+            totals[event.cat][rider.name] += x[1]
+
+            l.append((rider.name, x[1]))
+
+        l = _sort_by_points(l)
+        events.append((event.id, event.title, l))
 
     totals = {x[0]: _sort_by_points(x[1].items()) for x in totals.items()}
 
@@ -133,12 +146,7 @@ def compute_ride_results(riders, ride):
 def compute_overall_totals(rides_results):
     '''
     '''
-    totals = {
-        'KOM': {},
-        'QOM': {},
-        'Sprint': {},
-        'GC': {},
-    }
+    totals = {x: {} for x in EVENT_CATS}
 
     for total in rides_results:
         total = total[1]
