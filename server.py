@@ -10,9 +10,9 @@ app = Flask(__name__)
 @app.route('/')
 @lru_cache(maxsize=None)
 def index():
-    riders, rides = parse_all_data()
-    rides_results = [compute_ride_results(riders, r[1]) for r in rides.items()]
-    overall = compute_overall_totals(rides_results)
+    data = parse_data()
+    results = compute_all_ride_results()
+    overall = compute_overall_totals(results)
 
     return render_template('index.html', overall=overall)
 
