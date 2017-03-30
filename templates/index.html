@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block body %}
+<style>
+.panel-heading img {
+    padding-right: 1em;
+}
+.panel-heading {
+    background-image: none !important;
+}
+</style>
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 text-left">
+        <h2>Season Standings</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading"><img src="static/Jersey_yellow.png">Overall</div>
+            <div class="panel-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading"><img src="static/Jersey_polkadot.png">KOM</div>
+            <div class="panel-body">
+                <ul>
+                {% for h in hints %}
+                <li><a href="{{url_for('hints', hint=h)}}">Flag {{h}}</a></li>
+                {% endfor %}
+                </ul>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-default">
+        <div class="panel-heading"><img src="static/Jersey_polkadot.png">QOM</div>
+        <div class="panel-body">
+            <ol>
+            {% for b in board %}
+            <li><a href="{{url_for('score', username=b[0])}}">{{b[0]}}</a> &dash; {{b[2]}} points &dash; {{b[1]}} found</li>
+            {% endfor %}
+            </ol>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading"><img src="static/Jersey_green.png">Sprint</div>
+            <div class="panel-body">
+            <ul>
+                {% for h in hints %}
+                <li><a href="{{url_for('hints', hint=h)}}">Flag {{h}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
