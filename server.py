@@ -11,7 +11,7 @@ app = Flask(__name__)
 @lru_cache(maxsize=None)
 def index():
     data = parse_data()
-    results = compute_all_ride_results()
+    results = compute_all_ride_results(*data)
     overall = compute_overall_totals(results)
 
     return render_template('index.html', overall=overall)
