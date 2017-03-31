@@ -2,24 +2,24 @@
 
 {% block body %}
 <div class="row">
-    <div class="col-md-8 col-md-offset-2 text-left">
-        <h2>Season Standings</h2>
+    <div class="col-md-12 text-left">
+        <h2>RNWNR Standings</h2>
     </div>
 </div>
 
-{% with flag="static/Jersey_yellow.png", _results=overall['gc'], _title="GC" %}
+{% with flag="static/Jersey_yellow.png", _results=overall['gc'], _title="GC", row=1%}
     {% include "results_box.html" %}
 {% endwith %}
 
-{% with flag="static/Jersey_polkadot.png", _results=overall['kom'], _title="KOM" %}
+{% with flag="static/Jersey_polkadot.png", _results=overall['kom'], _title="KOM", row=0 %}
     {% include "results_box.html" %}
 {% endwith %}
 
-{% with flag="static/Jersey_polkadot.png", _results=overall['qom'], _title="QOM" %}
+{% with flag="static/Jersey_polkadot.png", _results=overall['qom'], _title="QOM", row=1 %}
     {% include "results_box.html" %}
 {% endwith %}
 
-{% with flag="static/Jersey_green.png", _results=overall['sprint'], _title="Sprint" %}
+{% with flag="static/Jersey_green.png", _results=overall['sprint'], _title="Sprint", row=0 %}
     {% include "results_box.html" %}
 {% endwith %}
 

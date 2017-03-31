@@ -3,28 +3,76 @@
 <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 <link rel='shortcut icon' href='/static/hacsoc.png'>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
 <link rel="shortcut icon" type="image/png" href="/static/Jersey_yellow.png">
 
 <body>
 <style>
+body {
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+body::-webkit-scrollbar { 
+    display: none;
+}
+
 .panel-heading img {
     padding-right: 1em;
 }
+
 .panel-heading {
     background-image: none !important;
+}
+
+.panel-body {
+    overflow: hidden;
+    transition: 0.5s;
+    max-height: 18em;
 }
 
 .text-muted {
     padding-bottom: 3em;
     text-align: right;
 }
+
+.navbar-default {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+}
+
+.col-md-2 {
+    width: 16.66666667%;
+}
+
+.hidden-section {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
 </style>
+<script>
+function toggle_section(section) {
+    var body = section.parentElement.children[1];
+    body.className = body.className == 'panel-body' ? 'panel-body hidden-section' : 'panel-body';
+}
+
+window.onload = function () {
+    var sections = document.getElementsByClassName('panel-heading');
+    for (var i = 0; i < sections.length; i++) {
+        (function (section) {
+            section.onclick = function () {
+                toggle_section(section);
+            };
+        })(sections[i]);
+    }
+};
+</script>
 
 <div class="navbar navbar-default">
     <div class="container">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
+            <div class="col-md-12">
                 <a class="navbar-brand" href="/">Cleats Leaderboards</a>
             </div>
         </div>
@@ -35,12 +83,7 @@
 </div>
 <footer class="container">
     <div class="row">
-        <a class="col-md-8 col-md-offset-2 text-muted" href="https://github.com/a-johnston/cleats-racing">Source on GitHub</a>
+        <a class="col-md-12 text-muted" href="https://github.com/a-johnston/cleats-racing">Source on GitHub</a>
     </div>
 </footer>
-<script
-    src="https://code.jquery.com/jquery-3.1.1.min.js"
-    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-    crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
 </body>
