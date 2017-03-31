@@ -10,7 +10,7 @@ app = Flask(__name__)
 def add_rankings(l, nmax=5):
     l[0] = (1, *l[0])
     for i in range(1, len(l)):
-        l[i] = (l[i-1][0] + (0 if l[i][-1] == l[i-1][-1] else 1), *l[i])
+        l[i] = (l[i-1][0] if l[i][-1] == l[i-1][-1] else i + 1, *l[i])
     l = (l + [('-', '-', '-')] * nmax)[:nmax]
     return l
 

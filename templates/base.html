@@ -51,23 +51,6 @@ body::-webkit-scrollbar {
     padding-bottom: 0;
 }
 </style>
-<script>
-function toggle_section(section) {
-    var body = section.parentElement.children[1];
-    body.className = body.className == 'panel-body' ? 'panel-body hidden-section' : 'panel-body';
-}
-
-window.onload = function () {
-    var sections = document.getElementsByClassName('panel-heading');
-    for (var i = 0; i < sections.length; i++) {
-        (function (section) {
-            section.onclick = function () {
-                toggle_section(section);
-            };
-        })(sections[i]);
-    }
-};
-</script>
 
 <div class="navbar navbar-default">
     <div class="container">
