@@ -4,8 +4,7 @@ import requests
 from collections import namedtuple
 
 
-DEFAULT_DATA_FILE = 'data.csv'
-DEFAULT_GSHEET_KEY = '11uhc4wGjhvH5T-M6RTt9kyMA6oDoEJrDjxZZo_7chuA'
+from config import DATA_FILE, GSHEET_KEY
 
 
 Ride = namedtuple('Ride', ('id', 'title', 'results'))
@@ -24,27 +23,24 @@ def _map_index(i):
     return lambda x: x[i]
 
 
-def add_rankings(l, nmax=5):
-    ''' Sorta poorly named, this just adds numerical rankings to results l and
-        limits to nmax results. If len(l) < nmax, fills in with dashes.
-    '''
-    l[0] = (1, *l[0])
-    for i in range(1, len(l)):
-        l[i] = (l[i-1][0] if l[i][-1] == l[i-1][-1] else i + 1, *l[i])
-    l = (l + [('-', '-', '-')] * nmax)[:nmax]
-    return l
+def load_raw_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
+    if data_file and os.path.exists(data_file):
+        with open(data_file) as f:
+            data_string = f.read()
+    else:
+        url = 'https://docs.google.com/spreadsheet/ccc?key={}&output=csv'
+        r = requests.get(url.format(gsheet_key))
+        r.raise_for_status()
+        data_string = r.content.decode()
+
+        if data_file:
+            with open(data_file, 'w') as f:
+                f.write(data_string)
+
+    return data_string
 
 
-def download_gsheets_csv(key=DEFAULT_GSHEET_KEY):
-    ''' Returns the CSV of the Google Sheet with the given key as a string
-    '''
-    url = 'https://docs.google.com/spreadsheet/ccc?key={}&output=csv'
-    r = requests.get(url.format(key))
-    r.raise_for_status()
-    return r.content.decode()
-
-
-def parse_data(data_file=DEFAULT_DATA_FILE, _gsheet_key=DEFAULT_GSHEET_KEY):
+def parse_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
     ''' Returns the tuple (riders, rides) where riders is a dict mapping id to
         name and rides is a dict mapping ride id to Ride namedtuple.
 
@@ -60,15 +56,7 @@ def parse_data(data_file=DEFAULT_DATA_FILE, _gsheet_key=DEFAULT_GSHEET_KEY):
     riders = {}
     events = {}
 
-    if data_file and os.path.exists(data_file):
-        with open(data_file) as f:
-            data_string = f.read()
-    else:
-        data_string = download_gsheets_csv(_gsheet_key)
-        if data_file:
-            with open(data_file, 'w') as f:
-                f.write(data_string)
-
+    data_string = load_raw_data(data_file, gsheet_key)
     reader = csv.reader(data_string.split('\n'))
 
     # contains ride title at or preceding first ride intermediate
@@ -123,8 +111,19 @@ def parse_data(data_file=DEFAULT_DATA_FILE, _gsheet_key=DEFAULT_GSHEET_KEY):
     return riders, list(rides.values())
 
 
-def _sort_by_points(l):
-    return sorted(l, key=_map_index(-1), reverse=True)
+def _add_rankings(l, nmax=5):
+    ''' Sorta poorly named, this just adds numerical rankings to results l and
+        limits to nmax results. If len(l) < nmax, fills in with dashes.
+    '''
+    l[0] = (1, *l[0])
+    for i in range(1, len(l)):
+        l[i] = (l[i-1][0] if l[i][-1] == l[i-1][-1] else i + 1, *l[i])
+    l = (l + [('-', '-', '-')] * nmax)[:nmax]
+    return l
+
+
+def _rank_by_points(l, nmax=5):
+    return _add_rankings(sorted(l, key=_map_index(-1), reverse=True), nmax)
 
 
 def compute_all_ride_results(riders, rides, nmax=5):
@@ -151,10 +150,10 @@ def compute_ride_results(riders, ride, nmax=5):
 
             l.append((rider.name, x[1]))
 
-        l = add_rankings(_sort_by_points(l), nmax)
+        l = _rank_by_points(l, nmax)
         events.append((event, l))
 
-    totals = {x[0]: add_rankings(_sort_by_points(x[1].items()), nmax) for x in totals.items()}
+    totals = {x[0]: _rank_by_points(x[1].items(), nmax) for x in totals.items()}
 
     return ride, events, totals
 
@@ -174,6 +173,6 @@ def compute_overall_totals(rides_results, nmax=5):
                     totals[event_type][rider[1]] = 0
                 totals[event_type][rider[1]] += rider[2]
 
-    totals = {x[0]: add_rankings(_sort_by_points(x[1].items()), nmax) for x in totals.items()}
+    totals = {x[0]: _rank_by_points(x[1].items(), nmax) for x in totals.items()}
 
     return totals

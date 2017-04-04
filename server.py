@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 from flask import Flask, abort, render_template, redirect
 from functools import lru_cache
+
 from data_churner import *
+from config import SITE_TITLE, EVENT_TITLE
 
 
 _flags = {
@@ -17,7 +19,7 @@ app = Flask(__name__)
 
 @lru_cache()
 def get_raw_results():
-    return parse_data(data_file=None)
+    return parse_data()
 
 
 @lru_cache()
@@ -36,7 +38,9 @@ def index():
         'index.html',
         overall=overall,
         stages=results,
-        flags=_flags
+        flags=_flags,
+        site_title=SITE_TITLE,
+        event_title=EVENT_TITLE,
     )
 
 
@@ -51,6 +55,8 @@ def stage(stage_id):
                 intermediate=stage[1],
                 totals=stage[2],
                 flags=_flags,
+                site_title=SITE_TITLE,
+                event_title=EVENT_TITLE,
             )
     abort(404)
 

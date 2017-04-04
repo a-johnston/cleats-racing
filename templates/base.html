@@ -1,5 +1,5 @@
 <!doctype html>
-<title>{% block title %}Cleats Leaderboards{% endblock %}</title>
+<title>{{ site_title }}</title>
 <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 <link rel='shortcut icon' href='/static/hacsoc.png'>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
@@ -7,6 +7,15 @@
 
 <body>
 <style>
+body {
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
 .panel-heading img {
     padding-right: 1em;
 }
@@ -15,8 +24,13 @@
     background-image: none !important;
 }
 
+a {
+    margin-right: 1em;
+}
+
 .text-muted {
     padding-right: 15px;
+    margin-right: 0;
     padding-bottom: 3em;
     float: right;
 }
@@ -36,7 +50,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <a class="navbar-brand" href="/">Cleats Leaderboards</a>
+                <a class="navbar-brand" href="/">{{ site_title }}</a>
             </div>
         </div>
     </div>
