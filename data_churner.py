@@ -61,9 +61,8 @@ def parse_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
 
     # contains ride title at or preceding first ride intermediate
     ride_row = next(reader)
-    if ride_row[0] != '' or ride_row[1] != '':
-        print(ride_row)
-        raise Exception('Unexpected format for first row')
+    ride_row[0] = ''
+    ride_row[1] = ''
 
     for ride in filter(_map_index(1), _idx_and_item(ride_row)):
         rides[ride[0]] = Ride(*ride, [])
