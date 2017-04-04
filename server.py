@@ -75,7 +75,3 @@ def reload():
 @app.errorhandler(500)
 def error(err):
     return 'not a page :('
-
-
-if __name__ == '__main__':
-    app.run()
