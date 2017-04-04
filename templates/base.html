@@ -7,15 +7,6 @@
 
 <body>
 <style>
-body {
-    -ms-overflow-style: none;
-    overflow: -moz-scrollbars-none;
-}
-
-body::-webkit-scrollbar { 
-    display: none;
-}
-
 .panel-heading img {
     padding-right: 1em;
 }
@@ -24,15 +15,10 @@ body::-webkit-scrollbar {
     background-image: none !important;
 }
 
-.panel-body {
-    overflow: hidden;
-    transition: 0.5s;
-    max-height: 18em;
-}
-
 .text-muted {
+    padding-right: 15px;
     padding-bottom: 3em;
-    text-align: right;
+    float: right;
 }
 
 .navbar-default {
@@ -43,12 +29,6 @@ body::-webkit-scrollbar {
 
 .col-md-2 {
     width: 16.66666667%;
-}
-
-.hidden-section {
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
 }
 </style>
 
@@ -66,7 +46,8 @@ body::-webkit-scrollbar {
 </div>
 <footer class="container">
     <div class="row">
-        <a class="col-md-12 text-muted" href="https://github.com/a-johnston/cleats-racing">Source on GitHub</a>
+        <a class="text-muted" href="https://github.com/a-johnston/cleats-racing">Source on GitHub</a>
+        <a class="text-muted" href="/reload">Load New Data</a>
     </div>
 </footer>
 </body>

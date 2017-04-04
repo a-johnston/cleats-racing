@@ -24,6 +24,17 @@ def _map_index(i):
     return lambda x: x[i]
 
 
+def add_rankings(l, nmax=5):
+    ''' Sorta poorly named, this just adds numerical rankings to results l and
+        limits to nmax results. If len(l) < nmax, fills in with dashes.
+    '''
+    l[0] = (1, *l[0])
+    for i in range(1, len(l)):
+        l[i] = (l[i-1][0] if l[i][-1] == l[i-1][-1] else i + 1, *l[i])
+    l = (l + [('-', '-', '-')] * nmax)[:nmax]
+    return l
+
+
 def download_gsheets_csv(key=DEFAULT_GSHEET_KEY):
     ''' Returns the CSV of the Google Sheet with the given key as a string
     '''
@@ -65,7 +76,7 @@ def parse_data(data_file=DEFAULT_DATA_FILE, _gsheet_key=DEFAULT_GSHEET_KEY):
     if ride_row[0] != '' or ride_row[1] != '':
         print(ride_row)
         raise Exception('Unexpected format for first row')
-    
+
     for ride in filter(_map_index(1), _idx_and_item(ride_row)):
         rides[ride[0]] = Ride(*ride, [])
 
@@ -82,6 +93,11 @@ def parse_data(data_file=DEFAULT_DATA_FILE, _gsheet_key=DEFAULT_GSHEET_KEY):
         event[0] = event[0].lower()
 
         if event[0] in ('kom', 'qom', 'sprint', 'gc'):
+            if event[0] == 'gc':
+                event[1] = 'GC'
+            elif event[0] == 'qom':
+                event[1] += ' (QOM)'
+
             ride_idx = max(filter(lambda i: i<= idx, rides))
             intermediate = Event(idx, event[0], event[1], {})
             events[intermediate.id] = intermediate
@@ -111,11 +127,11 @@ def _sort_by_points(l):
     return sorted(l, key=_map_index(-1), reverse=True)
 
 
-def compute_all_ride_results(riders, rides):
-    return [compute_ride_results(riders, ride) for ride in rides]
+def compute_all_ride_results(riders, rides, nmax=5):
+    return [compute_ride_results(riders, ride, nmax) for ride in rides]
 
 
-def compute_ride_results(riders, ride):
+def compute_ride_results(riders, ride, nmax=5):
     ''' Returns the printable results for a given ride. Intermediate events
         (KOMs, QOMs, Sprint, GC) are returned as a tuple with type, event
         name, and a descending list of names and points. Totals for all events
@@ -135,27 +151,29 @@ def compute_ride_results(riders, ride):
 
             l.append((rider.name, x[1]))
 
-        l = _sort_by_points(l)
-        events.append((event.id, event.title, l))
+        l = add_rankings(_sort_by_points(l), nmax)
+        events.append((event, l))
 
-    totals = {x[0]: _sort_by_points(x[1].items()) for x in totals.items()}
+    totals = {x[0]: add_rankings(_sort_by_points(x[1].items()), nmax) for x in totals.items()}
 
-    return events, totals
+    return ride, events, totals
 
 
-def compute_overall_totals(rides_results):
+def compute_overall_totals(rides_results, nmax=5):
     '''
     '''
     totals = {x: {} for x in EVENT_CATS}
 
     for total in rides_results:
-        total = total[1]
+        total = total[-1]
         for event_type in total:
             for rider in total[event_type]:
-                if rider[0] not in totals[event_type]:
-                    totals[event_type][rider[0]] = 0
-                totals[event_type][rider[0]] += rider[1]
+                if rider[0] == '-':
+                    continue
+                if rider[1] not in totals[event_type]:
+                    totals[event_type][rider[1]] = 0
+                totals[event_type][rider[1]] += rider[2]
 
-    totals = {x[0]: _sort_by_points(x[1].items()) for x in totals.items()}
+    totals = {x[0]: add_rankings(_sort_by_points(x[1].items()), nmax) for x in totals.items()}
 
     return totals

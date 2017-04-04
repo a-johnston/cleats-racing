@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="row"><h3 class="col-md-12 text-left">{{stage.title}} Overall Results</h3></div>
+
+{% with flag="/static/Jersey_yellow.png", _results=totals['gc'], _title="GC", row=1%}
+    {% include "results_box.html" %}
+{% endwith %}
+
+{% with flag="/static/Jersey_polkadot.png", _results=totals['kom'], _title="KOM", row=0 %}
+    {% include "results_box.html" %}
+{% endwith %}
+
+{% with flag="/static/Jersey_polkadot.png", _results=totals['qom'], _title="QOM", row=1 %}
+    {% include "results_box.html" %}
+{% endwith %}
+
+{% with flag="/static/Jersey_green.png", _results=totals['sprint'], _title="Sprint", row=0 %}
+    {% include "results_box.html" %}
+{% endwith %}
+
+<div class="row col-md-12">
+<h3 class="text-left">Intermediate Results</h3>
+</div>
+
+{% for event in intermediate %}
+    {% with flag=flags[event[0].cat], _results=event[1], _title=event[0].title, row=2 %}
+        {% include "results_box.html" %}
+    {% endwith %}
+{% endfor %}
+
+{% endblock %}

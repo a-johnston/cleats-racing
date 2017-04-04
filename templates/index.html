@@ -1,26 +1,29 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-12 text-left">
-        <h2>RNWNR Standings</h2>
-    </div>
+<div class="row"><h3 class="col-md-12 text-left">RSWNR Standings</h3></div>
+
+{% with flag="/static/Jersey_yellow.png", _results=overall['gc'], _title="GC", row=1%}
+    {% include "results_box.html" %}
+{% endwith %}
+
+{% with flag="/static/Jersey_polkadot.png", _results=overall['kom'], _title="KOM", row=0 %}
+    {% include "results_box.html" %}
+{% endwith %}
+
+{% with flag="/static/Jersey_polkadot.png", _results=overall['qom'], _title="QOM", row=1 %}
+    {% include "results_box.html" %}
+{% endwith %}
+
+{% with flag="/static/Jersey_green.png", _results=overall['sprint'], _title="Sprint", row=0 %}
+    {% include "results_box.html" %}
+{% endwith %}
+
+<div class="row col-md-12">
+<h3 class="text-left">Previous Editions</h3>
+{% for stage in stages %}
+    <a href="/stage/{{stage[0].id}}">{{ stage[0].title }}</a>
+{% endfor %}
 </div>
-
-{% with flag="static/Jersey_yellow.png", _results=overall['gc'], _title="GC", row=1%}
-    {% include "results_box.html" %}
-{% endwith %}
-
-{% with flag="static/Jersey_polkadot.png", _results=overall['kom'], _title="KOM", row=0 %}
-    {% include "results_box.html" %}
-{% endwith %}
-
-{% with flag="static/Jersey_polkadot.png", _results=overall['qom'], _title="QOM", row=1 %}
-    {% include "results_box.html" %}
-{% endwith %}
-
-{% with flag="static/Jersey_green.png", _results=overall['sprint'], _title="Sprint", row=0 %}
-    {% include "results_box.html" %}
-{% endwith %}
 
 {% endblock %}
