@@ -1,4 +1,4 @@
-SITE_TITLE = 'Cleats Leaderboards'
+SITE_TITLE = 'Cleats Leaderboards!'
 EVENT_TITLE = 'RSWNR'
 
 DATA_FILE = None
