@@ -1,0 +1,8 @@
+[Unit]
+Description=uWSGI instance serving cleats-racing
+
+[Service]
+ExecStart=/usr/bin/bash -c 'cd /www/cleats; source venv/bin/activate; uwsgi --ini cleats.ini'
+
+[Install]
+WantedBy=multi-user.target
