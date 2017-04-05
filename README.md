@@ -33,4 +33,4 @@ Included in `example_conf` are basic configuration files for NGINX and a uWSGI s
 
 The NGINX configuration file is extremely basic and for production should at least be modified to serve static files directly rather than delegating static file requests to flask.
 
-Additionally, there is a webhook file `hooks.json` which uses [Adnan Hajdarević's `webhook` tool](https://github.com/adnanh/webhook). Currently it runs a redeploy script for very simple CI/CD with GitHub, for example.
+Additionally, there is a webhook file `hooks.json` which uses [Adnan Hajdarević's `webhook` tool](https://github.com/adnanh/webhook). Currently it runs a redeploy script for very simple CI/CD with GitHub, for example. This can be run by `<go path>/bin/webhook -hooks example_conf/hooks.json -verbose`.
