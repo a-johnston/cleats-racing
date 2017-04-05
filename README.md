@@ -1,5 +1,6 @@
 Repository for <http://cleats.racing>.
 
+### How to run
 Python 3 is required to run this project. Virtualenv is recommended. To run your own instance of this repository:
 
 ```
@@ -12,6 +13,7 @@ flask run
 
 Now the page should be running at <http://127.0.0.1:5000>. To run flask in debug mode, run `export FLASK_DEBUG=1` before running. This will automatically restart the server with code changes and give much more verbose output.
 
+### Customization
 To customize this repository for your own race/ride series, simple changes can be made through `config.py`. For example, to change the title of the site, modify the `SITE_TITLE` line. Data is loaded off of Google Sheets and should follow a specific format:
  - The first row contains the names of individual races/rides (not necessarily adjacent)
    * The first and second columns of the first row are ignored
@@ -25,3 +27,8 @@ To customize this repository for your own race/ride series, simple changes can b
    * Rider results (third column onward) can be either an integer or blank
 
 An example of this format can be found on the [RSWNR results spreadsheet](https://docs.google.com/spreadsheets/d/11uhc4wGjhvH5T-M6RTt9kyMA6oDoEJrDjxZZo_7chuA/edit?usp=sharing).
+
+### Deploying with NGINX and uWSGI
+Included in `example_conf` are basic configuration files for NGINX and a uWSGI systemd service. The systemd service assumes the repository is located at `/www/cleats` and uses a virtualenv `venv/` and must be modified if this is not the case for your particular instance.
+
+The NGINX configuration file is extremely basic and for production should at least be modified to serve static files directly rather than delegating static file requests to flask.
