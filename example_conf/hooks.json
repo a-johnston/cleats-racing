@@ -1,0 +1,7 @@
+[
+  {
+    "id": "redeploy",
+    "execute-command": "/www/cleats-racing/redeploy.sh",
+    "command-working-directory": "www/cleats-racing"
+  }
+]

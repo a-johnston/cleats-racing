@@ -29,6 +29,8 @@ To customize this repository for your own race/ride series, simple changes can b
 An example of this format can be found on the [RSWNR results spreadsheet](https://docs.google.com/spreadsheets/d/11uhc4wGjhvH5T-M6RTt9kyMA6oDoEJrDjxZZo_7chuA/edit?usp=sharing).
 
 ### Deploying with NGINX and uWSGI
-Included in `example_conf` are basic configuration files for NGINX and a uWSGI systemd service. The systemd service assumes the repository is located at `/www/cleats` and uses a virtualenv `venv/` and must be modified if this is not the case for your particular instance.
+Included in `example_conf` are basic configuration files for NGINX and a uWSGI systemd service. The systemd service assumes the repository is located at `/www/cleats-racing` and uses a virtualenv `venv/` and must be modified if this is not the case for your particular instance.
 
 The NGINX configuration file is extremely basic and for production should at least be modified to serve static files directly rather than delegating static file requests to flask.
+
+Additionally, there is a webhook file `hooks.json` which uses [Adnan Hajdarević's `webhook` tool](https://github.com/adnanh/webhook). Currently it runs a redeploy script for very simple CI/CD with GitHub, for example.
