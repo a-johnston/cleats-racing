@@ -115,7 +115,7 @@ def _add_rankings(l, nmax=5):
         limits to nmax results. If len(l) < nmax, fills in with dashes.
     '''
     if not l:
-        return l
+        return [('-', '-', '-')] * nmax
 
     l[0] = (1, *l[0])
     for i in range(1, len(l)):
