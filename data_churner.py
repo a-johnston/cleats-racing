@@ -114,6 +114,9 @@ def _add_rankings(l, nmax=5):
     ''' Sorta poorly named, this just adds numerical rankings to results l and
         limits to nmax results. If len(l) < nmax, fills in with dashes.
     '''
+    if not l:
+        return l
+
     l[0] = (1, *l[0])
     for i in range(1, len(l)):
         l[i] = (l[i-1][0] if l[i][-1] == l[i-1][-1] else i + 1, *l[i])
