@@ -1,5 +1,6 @@
 import csv
 import os
+import time
 import requests
 from collections import namedtuple
 
@@ -23,21 +24,36 @@ def _map_index(i):
     return lambda x: x[i]
 
 
+_cached_data = None
+_cached_time = 0
+
+
+def _download_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
+    global _cached_data, _cached_time
+    url = 'https://docs.google.com/spreadsheet/ccc?key={}&output=csv'
+    r = requests.get(url.format(gsheet_key))
+    r.raise_for_status()
+    _cached_data = r.content.decode()
+    _cached_time = time.time()
+
+    if data_file:
+        with open(data_file, 'w+') as f:
+            f.write(_cached_data)
+
+
 def load_raw_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
+    global _cached_data, _cached_time
+
     if data_file and os.path.exists(data_file):
-        with open(data_file) as f:
-            data_string = f.read()
+        mtime = os.path.getmtime(data_file)
+        if _cached_time < mtime:
+            with open(data_file) as f:
+                _cached_data = f.read()
+                _cached_time = mtime
     else:
-        url = 'https://docs.google.com/spreadsheet/ccc?key={}&output=csv'
-        r = requests.get(url.format(gsheet_key))
-        r.raise_for_status()
-        data_string = r.content.decode()
+        _download_data(data_file, gsheet_key)
 
-        if data_file:
-            with open(data_file, 'w') as f:
-                f.write(data_string)
-
-    return data_string
+    return _cached_data
 
 
 def parse_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
@@ -107,7 +123,7 @@ def parse_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
                     events[idx].results[rider_id] = 0
                 events[idx].results[rider_id] += int(result)
 
-    return riders, list(rides.values())
+    return riders, [rides[x] for x in sorted(rides)]
 
 
 def _add_rankings(l, nmax=5):
