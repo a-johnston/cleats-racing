@@ -3,6 +3,10 @@
 {% block body %}
 <div class="row"><h3 class="col-md-12 text-left">{{ event_title }} Standings</h3></div>
 
+{% with flag=None, _results=overall['TOTAL'], _title="Total", row=2%}
+    {% include "results_box.html" %}
+{% endwith %}
+
 {% with flag="/static/Jersey_yellow.png", _results=overall['gc'], _title="GC", row=1%}
     {% include "results_box.html" %}
 {% endwith %}

@@ -3,7 +3,7 @@ from flask import Flask, abort, render_template, redirect
 from functools import lru_cache
 
 from data_churner import *
-from config import SITE_TITLE, EVENT_TITLE
+from config import SITE_TITLE, EVENT_TITLE, GSHEET_KEY
 
 
 _flags = {
@@ -15,6 +15,8 @@ _flags = {
 
 
 app = Flask(__name__)
+
+gdoc_link = 'https://docs.google.com/spreadsheets/d/{}/'.format(GSHEET_KEY)
 
 
 @lru_cache()
@@ -41,6 +43,7 @@ def index():
         flags=_flags,
         site_title=SITE_TITLE,
         event_title=EVENT_TITLE,
+        gdoc_link=gdoc_link,
     )
 
 
@@ -57,6 +60,7 @@ def stage(stage_id):
                 flags=_flags,
                 site_title=SITE_TITLE,
                 event_title=EVENT_TITLE,
+                gdoc_link=gdoc_link,
             )
     abort(404)
 

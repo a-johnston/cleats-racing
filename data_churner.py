@@ -180,6 +180,7 @@ def compute_overall_totals(rides_results, nmax=5):
     '''
     '''
     totals = {x: {} for x in EVENT_CATS}
+    totals['TOTAL'] = {}
 
     for total in rides_results:
         total = total[-1]
@@ -189,7 +190,10 @@ def compute_overall_totals(rides_results, nmax=5):
                     continue
                 if rider[1] not in totals[event_type]:
                     totals[event_type][rider[1]] = 0
+                if rider[1] not in totals['TOTAL']:
+                    totals['TOTAL'][rider[1]] = 0
                 totals[event_type][rider[1]] += rider[2]
+                totals['TOTAL'][rider[1]] += rider[2]
 
     totals = {x[0]: _rank_by_points(x[1].items(), nmax) for x in totals.items()}
 
