@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from flask import Flask, abort, render_template, redirect
-from functools import lru_cache
 
 from data_churner import *
 from config import SITE_TITLE, EVENT_TITLE, GSHEET_KEY
@@ -19,12 +18,10 @@ app = Flask(__name__)
 gdoc_link = 'https://docs.google.com/spreadsheets/d/{}/'.format(GSHEET_KEY)
 
 
-@lru_cache()
 def get_raw_results():
     return parse_data()
 
 
-@lru_cache()
 def get_results(nmax=5):
     data = get_raw_results()
     results = compute_all_ride_results(*data, nmax)
@@ -68,8 +65,6 @@ def stage(stage_id):
 @app.route('/reload')
 def reload():
     delete_cached_data()
-    get_raw_results.cache_clear()
-    get_results.cache_clear()
     parse_data()
     return redirect('/', code=302)
 

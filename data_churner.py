@@ -4,7 +4,6 @@ import time
 import requests
 from collections import namedtuple
 
-
 from config import DATA_FILE, GSHEET_KEY
 
 
