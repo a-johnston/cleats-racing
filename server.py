@@ -67,11 +67,10 @@ def stage(stage_id):
 
 @app.route('/reload')
 def reload():
-    # this is *super bad*. Ideally would at least hold up this request while
-    # loading new data rather than hold up a random request in between this
-    # and the redirect resolution
+    delete_cached_data()
     get_raw_results.cache_clear()
     get_results.cache_clear()
+    parse_data()
     return redirect('/', code=302)
 
 

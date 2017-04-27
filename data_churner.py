@@ -41,6 +41,10 @@ def _download_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
             f.write(_cached_data)
 
 
+def delete_cached_data(data_file=DATA_FILE):
+    os.remove(data_file)
+
+
 def load_raw_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
     global _cached_data, _cached_time
 
@@ -93,7 +97,8 @@ def parse_data(data_file=DATA_FILE, gsheet_key=GSHEET_KEY):
     for idx, event in _idx_and_item(info_row):
         event = (event + ':' + prev_name_hack).split(':')
         prev_name_hack = event[1]
-        event[0] = event[0].lower()
+        event[0] = event[0].lower().strip()
+        event[1] = event[1].strip()
 
         if event[0] in ('kom', 'qom', 'sprint', 'gc'):
             if event[0] == 'gc':
